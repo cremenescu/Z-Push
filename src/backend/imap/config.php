@@ -44,21 +44,9 @@ define('IMAP_AUTOSEEN_ON_DELETE', false);
 
 
 // Use IMAP IDLE (RFC 2177) in ChangesSink for near-instant push notifications.
-//      When false (default) the folders are polled every PING_INTERVAL seconds, as before.
-//      When true, one IDLE connection per synchronized folder is kept open for the duration of a Ping,
-//      and the backend falls back to polling for the rest of that Ping if IDLE fails for any reason.
-//      Requires an IMAP server that advertises the IDLE capability.
-//      The IDLE connections follow the transport flags in IMAP_OPTIONS (/ssl, /tls, /notls, /novalidate-cert).
-//      Without /notls they are always encrypted: if STARTTLS is not offered, IDLE is not used.
-//      Each Ping keeps its IDLE connections, plus its main IMAP connection, open for its whole lifetime.
-//      A Ping cancelled by the device keeps running on the server (index.php sets ignore_user_abort) and
-//      is only ended early, once a newer Ping of the same device arrives, if Z-Push has a working IPC
-//      provider (see IPC_PROVIDER in config.php; the default IpcSharedMemoryProvider needs the PHP sysvshm
-//      and sysvsem extensions). Without one, cancelled Pings accumulate connections until the IMAP server
-//      refuses new logins (Gmail allows 15 per account; Dovecot's mail_max_userip_connections defaults to
-//      10 per user and IP), and the device then asks for the password. Even with IPC, the older Ping is
-//      only ended between two IDLE waits and only if more than 60 seconds of its lifetime remain, so the
-//      connections of two Pings can briefly coexist: allow for about 2 x (folders + 1) per user and device.
+//      When false (default) the folders are polled every PING_INTERVAL seconds.
+//      When true, each Ping keeps one connection per synchronized folder open, which needs a working IPC provider.
+//      See https://github.com/Z-Hub/Z-Push/wiki/IMAP-IDLE
 define('IMAP_USE_IDLE', false);
 
 
